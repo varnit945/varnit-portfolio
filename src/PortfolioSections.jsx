@@ -48,20 +48,13 @@ export default function PortfolioSections() {
   const { startNarrationForSection } = usePresenter();
   const [activeTab, setActiveTab] = useState('skills');
 
-  // Set up intersection observers to trigger narration automatically when scrolled into view
+  // Intersection observers are used for animations, but no longer trigger narration, allowing continuous uninterrupted playback
   const [heroRef, heroInView] = useInView({ threshold: 0.4, triggerOnce: true });
   const [aboutRef, aboutInView] = useInView({ threshold: 0.4, triggerOnce: true });
   const [skillsRef, skillsInView] = useInView({ threshold: 0.4, triggerOnce: true });
   const [projectsRef, projectsInView] = useInView({ threshold: 0.4, triggerOnce: true });
   const [dsRef, dsInView] = useInView({ threshold: 0.4, triggerOnce: true });
   const [contactRef, contactInView] = useInView({ threshold: 0.4, triggerOnce: true });
-
-  useEffect(() => { if (heroInView) startNarrationForSection('hero'); }, [heroInView]);
-  useEffect(() => { if (aboutInView) startNarrationForSection('about'); }, [aboutInView]);
-  useEffect(() => { if (skillsInView) startNarrationForSection('skills'); }, [skillsInView]);
-  useEffect(() => { if (projectsInView) startNarrationForSection('projects'); }, [projectsInView]);
-  useEffect(() => { if (dsInView) startNarrationForSection('datascience'); }, [dsInView]);
-  useEffect(() => { if (contactInView) startNarrationForSection('contact'); }, [contactInView]);
 
   return (
     <div className="sections-container">
@@ -311,7 +304,7 @@ export default function PortfolioSections() {
         {/* Project 1 */}
         <div className="project-card-modern">
           <div className="project-banner">
-            <img src="/ai_dashboard_banner.png" alt="AI Productivity Dashboard Banner" />
+            <img src="./ai_dashboard_banner.png" alt="AI Productivity Dashboard Banner" />
           </div>
           <div className="project-content-padded">
             <span className="project-category">SAAS & PRODUCTIVITY</span>
@@ -342,7 +335,7 @@ export default function PortfolioSections() {
         {/* Project 2 */}
         <div className="project-card-modern">
           <div className="project-banner">
-            <img src="/ai_career_banner.png" alt="AI Career Analyzer Banner" />
+            <img src="./ai_career_banner.png" alt="AI Career Analyzer Banner" />
           </div>
           <div className="project-content-padded">
             <span className="project-category" style={{ color: '#8b5cf6', background: 'rgba(139, 92, 246, 0.1)' }}>AI & ANALYTICS</span>

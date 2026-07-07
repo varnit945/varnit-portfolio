@@ -4,58 +4,64 @@ const PresenterContext = createContext(null);
 
 const NARRATIONS = {
   hero: [
-    "Hello, I'm Varnit. Welcome to my AI-powered portfolio.",
-    "I am a software engineer and data scientist, specializing in building intelligent web platforms and machine learning pipelines."
+    "Under Graduate Software Developer.",
+    "Hi, I'm Varnit.",
+    "B-tech Student at UU."
   ],
   about: [
-    "I am deeply passionate about technology, analytics, and building high-performance systems.",
-    "With a strong foundation in computer science, my goal is to bridge the gap between complex data models and beautiful, minimal user experiences.",
-    "Welcome to my digital space."
+    "About Me.",
+    "I am currently pursuing a B.Tech in Computer Science Engineering at Uttaranchal University, Dehradun.",
+    "I completed my 10th and 12th education in my hometown, Chhutmalpur, where I built a strong academic foundation and developed a keen interest in technology.",
+    "I am a curious, dedicated, and enthusiastic learner who is always eager to explore new concepts and technologies.",
+    "My goal is to continuously enhance my technical skills, apply my knowledge to solve real-world problems, and contribute meaningfully to the field of computer science.",
+    "My interests include Web Development, Data Analytics, and AI Agents."
   ],
   skills: [
-    "Here are my core technical skills.",
-    "I specialize in Data Science and Machine Learning, Web Development, Cloud Computing, and Python engineering.",
-    "I focus on creating systems that are both powerful and highly optimized."
+    "Technical Skill Set.",
+    "In Development, I am advanced in HTML and CSS, JavaScript, and Python.",
+    "In Data Analytics, I use Excel, Power B I, SQL, and Tableau.",
+    "My additional skills include AI Agents using n 8 n, and Canva."
   ],
   projects: [
-    "I've built several full-stack applications and predictive data models.",
-    "Let me show you a few featured projects where I solved real-world challenges with clean code and advanced analytics."
-  ],
-  datascience: [
-    "As a data scientist, I believe that data is only as good as the insights we can extract from it.",
-    "Here you can view my analytical dashboards, machine learning models, and interactive reports."
+    "Featured Projects.",
+    "First project is the AI-Powered Student Productivity Dashboard.",
+    "A comprehensive SaaS platform built to integrate an AI chatbot, Study Hub, notes management, task scheduling, habit tracking, and a focus timer.",
+    "Designed a responsive and interactive dashboard with personalized AI assistance to help students organize their studies and improve learning efficiency.",
+    "Second project is the AI Career Analyzer.",
+    "An intelligent tool that evaluates users' skills, resumes, and career goals to provide personalized career recommendations and custom learning roadmaps."
   ],
   contact: [
-    "Let's connect and build the future together.",
-    "Whether you're a recruiter, developer, or researcher, feel free to reach out, download my resume, or drop a message."
+    "Contact Me.",
+    "You can reach me at varnit kamboj zero six at gmail dot com, or call me at 9 4 5 7 0 7 2 4 1 8.",
+    "Feel free to connect with me on Instagram, LinkedIn, and Github, or send me a message directly from the website."
   ]
 };
 
 // Database of answers for Interactive AI Q&A
 const QA_DATABASE = [
   {
-    keywords: ["who", "varnit", "you"],
-    answer: "I am Varnit, a passionate software engineer and data scientist who builds beautiful frontend interfaces and intelligent machine learning models."
+    keywords: ["who", "varnit", "you", "about"],
+    answer: "I am Varnit, an undergraduate B.Tech student at Uttaranchal University, passionate about Web Development, Data Analytics, and AI Agents."
   },
   {
-    keywords: ["skills", "technologies", "code", "programming"],
-    answer: "My core skills include Python, React, Three.js, machine learning, deep learning, SQL, Power BI, and cloud deployment."
+    keywords: ["skills", "technologies", "code", "programming", "development"],
+    answer: "My development skills include HTML, CSS, JavaScript, and Python. For data analytics, I use Excel, Power BI, SQL, and Tableau. I'm also skilled in building AI Agents using n8n."
   },
   {
-    keywords: ["projects", "work", "portfolio"],
-    answer: "I have built smart tools like Instasell, automated ML dashboards, interactive 3D visualizations, and predictive models."
+    keywords: ["projects", "work", "portfolio", "build"],
+    answer: "My featured projects include an AI-Powered Student Productivity Dashboard (a comprehensive SaaS platform) and an AI Career Analyzer."
   },
   {
-    keywords: ["education", "college", "degree"],
-    answer: "I have a solid background in Computer Science and Data Science, focusing on building scalable, data-driven applications."
+    keywords: ["education", "college", "degree", "school"],
+    answer: "I am currently pursuing a B.Tech in Computer Science Engineering at Uttaranchal University, Dehradun. I completed my schooling at Dellmond International School."
   },
   {
     keywords: ["resume", "cv", "download"],
     answer: "You can download my updated resume directly from the Contact section at the bottom of the screen."
   },
   {
-    keywords: ["contact", "email", "reach"],
-    answer: "You can contact me by filling out the form in the Contact section, or via my LinkedIn profile."
+    keywords: ["contact", "email", "reach", "phone"],
+    answer: "You can reach me at varnitkamboj06@gmail.com or call me at 9457072418. You can also send me a message directly from the Contact form!"
   }
 ];
 
@@ -78,12 +84,16 @@ export const PresenterProvider = ({ children }) => {
   const utteranceRef = useRef(null);
   const recognitionRef = useRef(null);
   const visemeIntervalRef = useRef(null);
+  const speechTimeoutRef = useRef(null);
+  const muteTimeoutRef = useRef(null);
+  const isMutedRef = useRef(true);
+  const isCancelledRef = useRef(false);
 
   // Speech Recognition will be initialized lazily on user gesture
 
   // Handle TTS boundary events for word highlighting and Visemes (lip sync)
   const animateLips = (text) => {
-    if (isMuted) {
+    if (isMutedRef.current) {
       setViseme('sil');
       return;
     }
@@ -117,6 +127,8 @@ export const PresenterProvider = ({ children }) => {
   };
 
   const speakText = (text, callback = null) => {
+    isCancelledRef.current = true; // Mark previous utterance as cancelled
+
     if (synthRef.current) {
       synthRef.current.cancel();
     }
@@ -124,17 +136,25 @@ export const PresenterProvider = ({ children }) => {
     if (visemeIntervalRef.current) {
       clearInterval(visemeIntervalRef.current);
     }
+    
+    if (muteTimeoutRef.current) {
+      clearTimeout(muteTimeoutRef.current);
+    }
 
-    if (isMuted) {
+    isCancelledRef.current = false; // Reset for new utterance
+
+    if (isMutedRef.current) {
       setSubtitles(text);
       setIsPlaying(true);
       // Simulate speech reading with fallback timer if muted
       let duration = text.split(' ').length * 400; 
       animateLips(text);
-      setTimeout(() => {
+      muteTimeoutRef.current = setTimeout(() => {
         setIsPlaying(false);
         setViseme('sil');
-        if (callback) callback();
+        if (!isCancelledRef.current && callback) {
+          callback();
+        }
       }, duration);
       return;
     }
@@ -175,7 +195,9 @@ export const PresenterProvider = ({ children }) => {
       setIsPlaying(false);
       setViseme('sil');
       setCurrentWordIndex(-1);
-      if (callback) callback();
+      if (!isCancelledRef.current && callback) {
+        callback();
+      }
     };
 
     utterance.onerror = () => {
@@ -184,10 +206,16 @@ export const PresenterProvider = ({ children }) => {
       setCurrentWordIndex(-1);
     };
 
-    synthRef.current.speak(utterance);
+    // Web Speech API bug fix: wait briefly after cancel() before speaking
+    setTimeout(() => {
+      synthRef.current.speak(utterance);
+    }, 50);
   };
 
   const startNarrationForSection = (section, sentenceIdx = 0) => {
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current);
+    }
     setCurrentSection(section);
     setCurrentSentenceIndex(sentenceIdx);
     const sentences = NARRATIONS[section];
@@ -200,14 +228,37 @@ export const PresenterProvider = ({ children }) => {
     speakText(sentences[sentenceIdx], () => {
       // Auto-advance to next sentence in section
       if (sentenceIdx + 1 < sentences.length) {
-        setTimeout(() => {
+        speechTimeoutRef.current = setTimeout(() => {
           startNarrationForSection(section, sentenceIdx + 1);
         }, 600); // Natural pause between sentences
+      } else {
+        // Mark as finished by updating index
+        setCurrentSentenceIndex(sentenceIdx + 1);
+        
+        // Auto-advance to the next section
+        const sections = Object.keys(NARRATIONS);
+        const currentIdx = sections.indexOf(section);
+        if (currentIdx !== -1 && currentIdx + 1 < sections.length) {
+          const nextSection = sections[currentIdx + 1];
+          speechTimeoutRef.current = setTimeout(() => {
+            startNarrationForSection(nextSection, 0);
+          }, 1200); // Slightly longer pause between different sections
+        } else {
+           setIsPlaying(false);
+           setViseme('sil');
+        }
       }
     });
   };
 
   const stopSpeaking = () => {
+    isCancelledRef.current = true; // Prevent any pending callbacks from firing
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current);
+    }
+    if (muteTimeoutRef.current) {
+      clearTimeout(muteTimeoutRef.current);
+    }
     if (synthRef.current) {
       synthRef.current.cancel();
     }
@@ -217,18 +268,22 @@ export const PresenterProvider = ({ children }) => {
     setIsPlaying(false);
     setViseme('sil');
     setCurrentWordIndex(-1);
+    setSubtitles(''); // Clear subtitles so it doesn't look like it's speaking
   };
 
   const toggleMute = () => {
     const nextMute = !isMuted;
     setIsMuted(nextMute);
+    isMutedRef.current = nextMute;
     if (nextMute) {
       stopSpeaking();
     } else {
-      // resume or replay current sentence
+      // resume or replay current section
       const sentences = NARRATIONS[currentSection];
-      if (sentences) {
-        speakText(sentences[currentSentenceIndex]);
+      if (sentences && currentSentenceIndex >= sentences.length) {
+        startNarrationForSection(currentSection, 0);
+      } else {
+        startNarrationForSection(currentSection, currentSentenceIndex);
       }
     }
   };

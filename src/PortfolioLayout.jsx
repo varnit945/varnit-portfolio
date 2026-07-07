@@ -7,7 +7,7 @@ import ErrorBoundary from './ErrorBoundary';
 import PortfolioSections from './PortfolioSections';
 import { 
   Volume2, VolumeX, Play, Square, Mic, Send, RefreshCw, 
-  Cpu, Sparkles, Navigation, ChevronRight, HelpCircle 
+  Cpu, Sparkles, Navigation, ChevronRight, HelpCircle, Terminal 
 } from 'lucide-react';
 
 export default function PortfolioLayout() {
@@ -41,7 +41,7 @@ export default function PortfolioLayout() {
   };
 
   const handleReplay = () => {
-    startNarrationForSection(currentSection, 0);
+    startNarrationForSection('hero', 0);
   };
 
   if (!isInitialized) {
@@ -80,11 +80,13 @@ export default function PortfolioLayout() {
 
       {/* Header */}
       <header className="app-header">
-        <div className="logo-container">
-          <div className="logo-badge">V</div>
-          <div>
-            <span className="logo-text">VARNIT</span>
-            <span className="logo-sub">PRESENTER.SYS v1.0</span>
+        <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ color: '#06b6d4', display: 'flex', alignItems: 'center' }}>
+            <Terminal size={28} strokeWidth={2.5} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="logo-text" style={{ color: '#06b6d4', letterSpacing: '1px', fontSize: '1.25rem' }}>VARNIT</span>
+            <span className="logo-sub" style={{ opacity: 0.7 }}>PORTFOLIO.SYS</span>
           </div>
         </div>
 
