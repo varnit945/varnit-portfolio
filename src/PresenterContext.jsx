@@ -164,25 +164,40 @@ export const PresenterProvider = ({ children }) => {
     
     // Configure voice properties
     utterance.rate = playbackSpeed; // Default speed
-    utterance.lang = 'en-IN'; // Prefer Indian English to match the accent in the audio sample
-    utterance.pitch = 1.1; // Slightly higher pitch for a younger male voice
+    utterance.pitch = 1.0; // Reset pitch to 1.0 to avoid distortion on mobile browsers
     
     // Get available voices
     const voices = synthRef.current.getVoices();
     
-    // Try to find a male Indian English voice first, then UK/US male voices
-    const bestVoice = voices.find(v => 
-      (v.name.includes('Ravi') || v.name.includes('Indian') || v.lang === 'en-IN') && v.name.toLowerCase().includes('male')
-    ) || voices.find(v => 
-      (v.lang === 'en-IN' || v.name.includes('Ravi'))
-    ) || voices.find(v => 
-      (v.name.includes('Google UK English Male') || v.name.includes('David') || v.name.includes('Daniel') || v.name.includes('Male')) && v.lang.startsWith('en')
-    ) || voices.find(v => 
-      v.lang.startsWith('en') && v.name.toLowerCase().includes('male')
-    ) || voices[0];
+    // Cross-platform robust male voice matching
+    const isMatch = (v, keywords) => keywords.some(k => v.name.toLowerCase().includes(k.toLowerCase()));
     
+    // Priority 1: Indian Male voices (iOS: Rishi, Windows: Ravi, Android: en-in voices that aren't female)
+    let bestVoice = voices.find(v => 
+      (isMatch(v, ['rishi', 'ravi']) || v.lang.toLowerCase() === 'en-in') 
+      && !isMatch(v, ['female', 'zira', 'samantha', 'siri female', 'hazel'])
+    );
+
+    // Priority 2: High quality UK/US Male voices
+    if (!bestVoice) {
+      bestVoice = voices.find(v => 
+        isMatch(v, ['google uk english male', 'daniel', 'david', 'arthur', 'alex', 'male']) && v.lang.startsWith('en')
+      );
+    }
+
+    // Priority 3: Any English voice that isn't explicitly female
+    if (!bestVoice) {
+      bestVoice = voices.find(v => 
+        v.lang.startsWith('en') && !isMatch(v, ['female', 'zira', 'samantha', 'siri female', 'hazel', 'victoria'])
+      );
+    }
+
     if (bestVoice) {
       utterance.voice = bestVoice;
+      utterance.lang = bestVoice.lang; // Match utterance lang to voice lang to prevent mobile glitches
+    } else {
+      utterance.lang = 'en-US';
+      if (voices.length > 0) utterance.voice = voices[0];
     }
 
     setSubtitles(text);
