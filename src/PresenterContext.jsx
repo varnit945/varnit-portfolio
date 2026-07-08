@@ -163,20 +163,22 @@ export const PresenterProvider = ({ children }) => {
     utteranceRef.current = utterance;
     
     // Configure voice properties
-    utterance.rate = playbackSpeed; // Default speed to avoid distorting mobile voices
-    utterance.lang = language;
-    utterance.pitch = 1.05; // Closer to 1 to prevent chipmunk effect on phones
+    utterance.rate = playbackSpeed; // Default speed
+    utterance.lang = 'en-IN'; // Prefer Indian English to match the accent in the audio sample
+    utterance.pitch = 1.1; // Slightly higher pitch for a younger male voice
     
     // Get available voices
     const voices = synthRef.current.getVoices();
     
-    // Try to find high quality female/sweet voices. We allow network voices because they sound much better on mobile devices.
+    // Try to find a male Indian English voice first, then UK/US male voices
     const bestVoice = voices.find(v => 
-      (v.name.includes('Google US English') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Hazel') || v.name.includes('Female') || v.name.includes('Siri')) && v.lang.startsWith('en')
+      (v.name.includes('Ravi') || v.name.includes('Indian') || v.lang === 'en-IN') && v.name.toLowerCase().includes('male')
     ) || voices.find(v => 
-      (v.name.includes('Natural') || v.name.includes('Premium') || v.name.includes('Online')) && v.lang.startsWith('en')
+      (v.lang === 'en-IN' || v.name.includes('Ravi'))
     ) || voices.find(v => 
-      v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')
+      (v.name.includes('Google UK English Male') || v.name.includes('David') || v.name.includes('Daniel') || v.name.includes('Male')) && v.lang.startsWith('en')
+    ) || voices.find(v => 
+      v.lang.startsWith('en') && v.name.toLowerCase().includes('male')
     ) || voices[0];
     
     if (bestVoice) {
