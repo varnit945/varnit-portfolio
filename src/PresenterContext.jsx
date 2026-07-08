@@ -163,20 +163,24 @@ export const PresenterProvider = ({ children }) => {
     utteranceRef.current = utterance;
     
     // Configure voice properties
-    utterance.rate = playbackSpeed * 0.95; // Slightly slower for a clearer, sweeter voice
+    utterance.rate = playbackSpeed; // Default speed to avoid distorting mobile voices
     utterance.lang = language;
-    utterance.pitch = 1.2; // Slightly higher pitch for sweetness
+    utterance.pitch = 1.05; // Closer to 1 to prevent chipmunk effect on phones
     
-    // Choose local offline voices if available, preferring clear female voices for a "hard and sweet" tone
+    // Get available voices
     const voices = synthRef.current.getVoices();
-    const localVoice = voices.find(v => 
-      (v.name.includes('Zira') || v.name.includes('Hazel') || v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')) && v.lang.startsWith('en')
-    ) || voices.find(v => 
-      v.localService && (v.name.includes('Natural') || v.name.includes('Microsoft') || v.name.includes('Google')) && v.lang.startsWith('en')
-    ) || voices.find(v => v.localService && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
     
-    if (localVoice) {
-      utterance.voice = localVoice;
+    // Try to find high quality female/sweet voices. We allow network voices because they sound much better on mobile devices.
+    const bestVoice = voices.find(v => 
+      (v.name.includes('Google US English') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Hazel') || v.name.includes('Female') || v.name.includes('Siri')) && v.lang.startsWith('en')
+    ) || voices.find(v => 
+      (v.name.includes('Natural') || v.name.includes('Premium') || v.name.includes('Online')) && v.lang.startsWith('en')
+    ) || voices.find(v => 
+      v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')
+    ) || voices[0];
+    
+    if (bestVoice) {
+      utterance.voice = bestVoice;
     }
 
     setSubtitles(text);
