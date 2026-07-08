@@ -246,38 +246,33 @@ export const PresenterProvider = ({ children }) => {
     synthRef.current.speak(utterance);
   };
 
-  const startNarrationForSection = (section, sentenceIdx = 0) => {
+  const startNarrationForSection = (section) => {
     if (speechTimeoutRef.current) {
       clearTimeout(speechTimeoutRef.current);
     }
     setCurrentSection(section);
-    setCurrentSentenceIndex(sentenceIdx);
+    setCurrentSentenceIndex(0); // We'll just show the first sentence as subtitle, or the whole thing
     const sentences = NARRATIONS[section];
 
-    if (!sentences || sentenceIdx >= sentences.length) {
+    if (!sentences || sentences.length === 0) {
       setIsPlaying(false);
       return;
     }
 
-    speakText(sentences[sentenceIdx], () => {
-      // Auto-advance to next sentence in section synchronously to keep gesture privileges
-      if (sentenceIdx + 1 < sentences.length) {
-        startNarrationForSection(section, sentenceIdx + 1);
+    // Join all sentences with a slight pause marker (a comma or period) so the engine breathes,
+    // but pass it as a SINGLE utterance to avoid mobile browsers killing the gesture privilege on 'onend'
+    const fullText = sentences.join('. ');
+
+    speakText(fullText, () => {
+      // Auto-advance to the next section
+      const sections = Object.keys(NARRATIONS);
+      const currentIdx = sections.indexOf(section);
+      if (currentIdx !== -1 && currentIdx + 1 < sections.length) {
+        const nextSection = sections[currentIdx + 1];
+        startNarrationForSection(nextSection);
       } else {
-        // Mark as finished by updating index
-        setCurrentSentenceIndex(sentenceIdx + 1);
-        
-        // Auto-advance to the next section
-        const sections = Object.keys(NARRATIONS);
-        const currentIdx = sections.indexOf(section);
-        if (currentIdx !== -1 && currentIdx + 1 < sections.length) {
-          const nextSection = sections[currentIdx + 1];
-          // We can use a short timeout here between sections if we want, but it's safer to just proceed
-          startNarrationForSection(nextSection, 0);
-        } else {
-           setIsPlaying(false);
-           setViseme('sil');
-        }
+         setIsPlaying(false);
+         setViseme('sil');
       }
     });
   };
