@@ -163,12 +163,15 @@ export const PresenterProvider = ({ children }) => {
     utteranceRef.current = utterance;
     
     // Configure voice properties
-    utterance.rate = playbackSpeed;
+    utterance.rate = playbackSpeed * 0.95; // Slightly slower for a clearer, sweeter voice
     utterance.lang = language;
+    utterance.pitch = 1.2; // Slightly higher pitch for sweetness
     
-    // Choose local offline voices if available, to prevent silent play on restricted networks
+    // Choose local offline voices if available, preferring clear female voices for a "hard and sweet" tone
     const voices = synthRef.current.getVoices();
     const localVoice = voices.find(v => 
+      (v.name.includes('Zira') || v.name.includes('Hazel') || v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')) && v.lang.startsWith('en')
+    ) || voices.find(v => 
       v.localService && (v.name.includes('Natural') || v.name.includes('Microsoft') || v.name.includes('Google')) && v.lang.startsWith('en')
     ) || voices.find(v => v.localService && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
     
