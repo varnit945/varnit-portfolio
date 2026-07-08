@@ -230,10 +230,20 @@ export const PresenterProvider = ({ children }) => {
       setCurrentWordIndex(-1);
     };
 
-    // Web Speech API bug fix: wait briefly after cancel() before speaking
-    setTimeout(() => {
-      synthRef.current.speak(utterance);
-    }, 50);
+    // Heartbeat to prevent the infamous 15-second garbage collection bug on mobile TTS
+    if (window.speechHeartbeat) clearInterval(window.speechHeartbeat);
+    window.speechHeartbeat = setInterval(() => {
+      if (synthRef.current.speaking) {
+        // This micro-pause keeps the engine awake on mobile Chrome/Safari
+        synthRef.current.pause();
+        synthRef.current.resume();
+      } else {
+        clearInterval(window.speechHeartbeat);
+      }
+    }, 10000);
+
+    // Call speak synchronously. Mobile browsers will drop it if inside a setTimeout!
+    synthRef.current.speak(utterance);
   };
 
   const startNarrationForSection = (section, sentenceIdx = 0) => {
@@ -250,11 +260,9 @@ export const PresenterProvider = ({ children }) => {
     }
 
     speakText(sentences[sentenceIdx], () => {
-      // Auto-advance to next sentence in section
+      // Auto-advance to next sentence in section synchronously to keep gesture privileges
       if (sentenceIdx + 1 < sentences.length) {
-        speechTimeoutRef.current = setTimeout(() => {
-          startNarrationForSection(section, sentenceIdx + 1);
-        }, 600); // Natural pause between sentences
+        startNarrationForSection(section, sentenceIdx + 1);
       } else {
         // Mark as finished by updating index
         setCurrentSentenceIndex(sentenceIdx + 1);
@@ -264,9 +272,8 @@ export const PresenterProvider = ({ children }) => {
         const currentIdx = sections.indexOf(section);
         if (currentIdx !== -1 && currentIdx + 1 < sections.length) {
           const nextSection = sections[currentIdx + 1];
-          speechTimeoutRef.current = setTimeout(() => {
-            startNarrationForSection(nextSection, 0);
-          }, 1200); // Slightly longer pause between different sections
+          // We can use a short timeout here between sections if we want, but it's safer to just proceed
+          startNarrationForSection(nextSection, 0);
         } else {
            setIsPlaying(false);
            setViseme('sil');
