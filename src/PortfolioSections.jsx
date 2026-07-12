@@ -319,7 +319,7 @@ export default function PortfolioSections() {
               <span className="tech-badge">Python</span>
               <span className="tech-badge">FastAPI</span>
               <span className="tech-badge">Groq SDK</span>
-              <span className="tech-badge">SQLite</span>
+              <span className="tech-badge">Supabase</span>
               <span className="tech-badge">pypdf</span>
               <span className="tech-badge">python-docx</span>
               <span className="tech-badge">Feedparser</span>
@@ -347,7 +347,7 @@ export default function PortfolioSections() {
               <span className="tech-badge">Vanilla JS/CSS</span>
               <span className="tech-badge">Python</span>
               <span className="tech-badge">Flask</span>
-              <span className="tech-badge">SQLite</span>
+              <span className="tech-badge">Supabase</span>
               <span className="tech-badge">Docker</span>
               <span className="tech-badge">pypdf</span>
               <span className="tech-badge">pytesseract</span>
