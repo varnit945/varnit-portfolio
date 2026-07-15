@@ -327,7 +327,7 @@ export default function PortfolioSections() {
             
             <div className="project-action-row">
               <a href="https://github.com/varnit945/AI-POWERED-PERSONAL-DASHBOARD" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem' }}><GithubIcon size={16} /> CODEBASE</a>
-              <a href="https://ai-powered-personal-dashboard-fr3e-varnit945s-projects.vercel.app/" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem', border: '1px solid rgba(6, 182, 212, 0.3)', background: 'rgba(2, 4, 10, 0.6)' }}><ExternalLink size={16} /> LIVE DEMO</a>
+              <a href="https://ai-powered-personal-dashboard-fr3e.vercel.app/" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem', border: '1px solid rgba(6, 182, 212, 0.3)', background: 'rgba(2, 4, 10, 0.6)' }}><ExternalLink size={16} /> LIVE DEMO</a>
             </div>
           </div>
         </div>
@@ -355,8 +355,8 @@ export default function PortfolioSections() {
             </div>
             
             <div className="project-action-row">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem' }}><GithubIcon size={16} /> CODEBASE</a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem', border: '1px solid rgba(139, 92, 246, 0.3)', background: 'rgba(2, 4, 10, 0.6)' }}><ExternalLink size={16} /> LIVE DEMO</a>
+              <a href="https://github.com/varnit945/AI_ANALYSER" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem' }}><GithubIcon size={16} /> CODEBASE</a>
+              <a href="https://ai-analyser-2sagy4aaq-varnit945s-projects.vercel.app/" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.25rem', border: '1px solid rgba(139, 92, 246, 0.3)', background: 'rgba(2, 4, 10, 0.6)' }}><ExternalLink size={16} /> LIVE DEMO</a>
             </div>
           </div>
         </div>
